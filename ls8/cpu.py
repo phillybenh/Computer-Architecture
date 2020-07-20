@@ -2,6 +2,10 @@
 
 import sys
 
+HLT = 0b00000001
+LDI = 0b10000010
+PRN = 0b01000111
+
 class CPU:
     """Main CPU class."""
 
@@ -10,6 +14,7 @@ class CPU:
         self.ram = [0] * 256
         self.reg = [0] * 8
         self.pc = 0
+        self.running = True
 
     ## RAM Functions
     # Memory Address Register, holds the memory address we're 
@@ -17,7 +22,7 @@ class CPU:
     #  Memory Data Register, holds the value to write or the 
     # value just read
     def ram_read(self,MAR):
-        return (self.ram[MAR])
+        return self.ram[MAR]
 
     def ram_write(self, MDR, MAR):
         self.ram[MAR] = MDR
@@ -72,7 +77,31 @@ class CPU:
             print(" %02X" % self.reg[i], end='')
 
         print()
+    
+    def hlt(self):
+        self.running = False
+
+    def ldi(self, operand_a, operand_b):
+
+        self.reg[operand_a] = operand_b
+        self.pc += 3
+    
+    def prn(self, operand_a):
+        print(self.reg[operand_a])
+        self.pc += 2
 
     def run(self):
         """Run the CPU."""
-        pass
+        
+        # self.trace()
+        while self.running:
+            ir = self.pc
+            inst = self.ram[ir]
+            operand_a = self.ram_read(ir + 1)
+            operand_b = self.ram_read(ir + 2)
+            if inst == HLT:  # 0b00000001
+                self.hlt()
+            elif inst == LDI:  # 0b10000010
+                self.ldi(operand_a, operand_b)
+            elif inst == PRN:  # 0b01000111
+                self.prn(operand_a)
