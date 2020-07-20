@@ -11,6 +11,17 @@ class CPU:
         self.reg = [0] * 8
         self.pc = 0
 
+    ## RAM Functions
+    # Memory Address Register, holds the memory address we're 
+    # reading or writing
+    #  Memory Data Register, holds the value to write or the 
+    # value just read
+    def ram_read(self,MAR):
+        return (self.ram[MAR])
+
+    def ram_write(self, MDR, MAR):
+        self.ram[MAR] = MDR
+
     def load(self):
         """Load a program into memory."""
 
