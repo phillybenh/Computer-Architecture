@@ -17,19 +17,18 @@ class CPU:
         self.ram = [0] * 256
         self.reg = [0] * 8
         self.pc = 0
+        self.sp = 7 # stack pointer
         self.running = True
         self.operand_a = self.ram_read(self.pc + 1)
         self.operand_b = self.ram_read(self.pc + 2)
-        # I think this was what Beej was talking about?
-        # TODO: figure out how to handle passing in arguments when
-        # using a branchtable
+
         self.branchtable = {}
         self.branchtable[HLT] = self.hlt
         self.branchtable[LDI] = self.ldi
         self.branchtable[PRN] = self.prn
         self.branchtable[MUL] = self.mul
-        # self.branchtable[PUSH] = self.push
-        # self.branchtable[POP] = self.pop
+        self.branchtable[PUSH] = self.push
+        self.branchtable[POP] = self.pop
 
     ## RAM Functions
     # Memory Address Register, holds the memory address we're 
@@ -44,13 +43,11 @@ class CPU:
 
     def load(self, file):
         """Load a program into memory."""
-        # print(test)
         address = 0
 
         try:
             with open(file) as f:
                 for line in f:
-                    # print(line)
                     try:
                         line = line.strip()
                         line = line.split('#', 1)[0]
@@ -62,11 +59,6 @@ class CPU:
         except FileNotFoundError:
             print(f"Couldn't find file {file}")
             sys.exit(1)
-
-
-        # for instruction in program:
-        #     self.ram[address] = instruction
-        #     address += 1
 
 
     def alu(self, op, reg_a, reg_b):
@@ -114,6 +106,17 @@ class CPU:
     def mul(self):
         self.alu("MUL", self.operand_a, self.operand_b)
         self.pc += 3
+    
+    def push(self):
+        # secrement the sp
+        self.reg[self.sp] -= 1
+        self.ram[self.reg[self.sp]] = self.reg[self.operand_a]
+        self.pc += 2
+
+    def pop(self):
+        self.reg[self.operand_a] = self.ram[self.reg[self.sp]]
+        self.reg[self.sp] += 1
+        self.pc += 2
 
     def run(self):
         """Run the CPU."""
@@ -125,11 +128,4 @@ class CPU:
             self.operand_a = self.ram_read(ir + 1)
             self.operand_b = self.ram_read(ir + 2)
             self.branchtable[inst]()
-            # if inst == HLT:  # 0b00000001
-            #     self.hlt()
-            # elif inst == LDI:  # 0b10000010
-            #     self.ldi(operand_a, operand_b)
-            # elif inst == PRN:  # 0b01000111
-            #     self.prn(operand_a)
-            # elif inst == MUL:  
-            #     self.mul(operand_a, operand_b)
+
