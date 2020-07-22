@@ -6,6 +6,8 @@ HLT = 0b00000001
 LDI = 0b10000010
 PRN = 0b01000111
 MUL = 0b10100010
+PUSH = 0b01000101
+POP = 0b01000110
 
 class CPU:
     """Main CPU class."""
@@ -16,6 +18,8 @@ class CPU:
         self.reg = [0] * 8
         self.pc = 0
         self.running = True
+        self.operand_a = self.ram_read(self.pc + 1)
+        self.operand_b = self.ram_read(self.pc + 2)
         # I think this was what Beej was talking about?
         # TODO: figure out how to handle passing in arguments when
         # using a branchtable
@@ -24,6 +28,8 @@ class CPU:
         self.branchtable[LDI] = self.ldi
         self.branchtable[PRN] = self.prn
         self.branchtable[MUL] = self.mul
+        # self.branchtable[PUSH] = self.push
+        # self.branchtable[POP] = self.pop
 
     ## RAM Functions
     # Memory Address Register, holds the memory address we're 
@@ -97,16 +103,16 @@ class CPU:
     def hlt(self):
         self.running = False
 
-    def ldi(self, operand_a, operand_b):
-        self.reg[operand_a] = operand_b
+    def ldi(self):
+        self.reg[self.operand_a] = self.operand_b
         self.pc += 3
     
-    def prn(self, operand_a):
-        print(self.reg[operand_a])
+    def prn(self):
+        print(self.reg[self.operand_a])
         self.pc += 2
 
-    def mul(self, operand_a, operand_b):
-        self.alu("MUL", operand_a, operand_b)
+    def mul(self):
+        self.alu("MUL", self.operand_a, self.operand_b)
         self.pc += 3
 
     def run(self):
@@ -116,14 +122,14 @@ class CPU:
         while self.running:
             ir = self.pc
             inst = self.ram[ir]
-            operand_a = self.ram_read(ir + 1)
-            operand_b = self.ram_read(ir + 2)
-            # self.branchtable[inst]()
-            if inst == HLT:  # 0b00000001
-                self.hlt()
-            elif inst == LDI:  # 0b10000010
-                self.ldi(operand_a, operand_b)
-            elif inst == PRN:  # 0b01000111
-                self.prn(operand_a)
-            elif inst == MUL:  
-                self.mul(operand_a, operand_b)
+            self.operand_a = self.ram_read(ir + 1)
+            self.operand_b = self.ram_read(ir + 2)
+            self.branchtable[inst]()
+            # if inst == HLT:  # 0b00000001
+            #     self.hlt()
+            # elif inst == LDI:  # 0b10000010
+            #     self.ldi(operand_a, operand_b)
+            # elif inst == PRN:  # 0b01000111
+            #     self.prn(operand_a)
+            # elif inst == MUL:  
+            #     self.mul(operand_a, operand_b)
