@@ -8,6 +8,8 @@ PRN = 0b01000111
 MUL = 0b10100010
 PUSH = 0b01000101
 POP = 0b01000110
+CALL = 0b01010000
+RET = 0b00010001
 
 class CPU:
     """Main CPU class."""
@@ -29,6 +31,8 @@ class CPU:
         self.branchtable[MUL] = self.mul
         self.branchtable[PUSH] = self.push
         self.branchtable[POP] = self.pop
+        self.branchtable[CALL] = self.call
+        self.branchtable[RET] = self.ret
 
     ## RAM Functions
     # Memory Address Register, holds the memory address we're 
@@ -110,13 +114,39 @@ class CPU:
     def push(self):
         # secrement the sp
         self.reg[self.sp] -= 1
+        # self.reg[self.sp] &= 0xff
         self.ram[self.reg[self.sp]] = self.reg[self.operand_a]
         self.pc += 2
 
     def pop(self):
         self.reg[self.operand_a] = self.ram[self.reg[self.sp]]
         self.reg[self.sp] += 1
+        # self.reg[self.sp] &= 0xff
+
         self.pc += 2
+    
+    def call(self):
+        """
+        ### CALL register
+        `CALL register`
+        Calls a subroutine (function) at the address stored in the register.
+        1. The address of the ***instruction*** _directly after_ `CALL` is
+           pushed onto the stack. This allows us to return to where we left off 
+           when the subroutine finishes executing.
+        2. The PC is set to the address stored in the given register. We jump 
+            to that location in RAM and execute the first instruction in the 
+            subroutine. The PC can move forward or backwards from its current 
+            location.
+            """
+            pass
+    def ret(self):
+        """
+        ### RET
+        `RET`
+        Return from subroutine.
+        Pop the value from the top of the stack and store it in the `PC`.
+        """
+        pass
 
     def run(self):
         """Run the CPU."""
