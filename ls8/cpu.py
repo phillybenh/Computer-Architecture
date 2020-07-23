@@ -10,6 +10,7 @@ PUSH = 0b01000101
 POP = 0b01000110
 CALL = 0b01010000
 RET = 0b00010001
+ADD = 0b10100000
 
 class CPU:
     """Main CPU class."""
@@ -28,6 +29,7 @@ class CPU:
         self.branchtable[HLT] = self.hlt
         self.branchtable[LDI] = self.ldi
         self.branchtable[PRN] = self.prn
+        self.branchtable[ADD] = self.add
         self.branchtable[MUL] = self.mul
         self.branchtable[PUSH] = self.push
         self.branchtable[POP] = self.pop
@@ -110,6 +112,10 @@ class CPU:
     def mul(self):
         self.alu("MUL", self.operand_a, self.operand_b)
         self.pc += 3
+
+    def add(self):
+        self.alu("ADD", self.operand_a, self.operand_b)
+        self.pc += 3
     
     def push(self):
         # decrement the sp
@@ -126,6 +132,7 @@ class CPU:
         self.pc += 2
     
     def call(self):
+        
         # Get address of the next instruction
         return_addr = self.pc + 2
 
@@ -154,9 +161,11 @@ class CPU:
         
         # self.trace()
         while self.running:
+            # self.trace()
             ir = self.pc
             inst = self.ram[ir]
             self.operand_a = self.ram_read(ir + 1)
             self.operand_b = self.ram_read(ir + 2)
             self.branchtable[inst]()
+            
 
