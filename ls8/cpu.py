@@ -91,11 +91,17 @@ class CPU:
         elif op == "MUL":
             self.reg[reg_a] *= self.reg[reg_b]
         elif op == "CMP":
-            if reg_a == reg_b:
+            if self.reg[reg_a] == self.reg[reg_b]:
                 self.fl[EQ] = 1
-            elif reg_a < reg_b:
+                # self.fl[LT] = 0self.reg[reg_b]
+                # self.fl[GT] = 0
+            elif self.reg[reg_a] < self.reg[reg_b]:
+                # self.fl[EQ] = 0
                 self.fl[LT] = 1
-            elif reg_a > reg_b:
+                # self.fl[GT] = 0
+            elif self.reg[reg_a] > self.reg[reg_b]:
+                # self.fl[EQ] = 0
+                # self.fl[LT] = 0
                 self.fl[GT] = 1
         else:
             raise Exception("Unsupported ALU operation")
@@ -105,8 +111,8 @@ class CPU:
         Handy function to print out the CPU state. You might want to call this
         from run() if you need help debugging.
         """
-        print("KEY: PC | FL | RAM[PC] RAM[PC+1] RAM[PC+2] | REG[0]...REG[7]")
-        print(f"TRACE: %02X | %s | %02X %02X %02X |" % (
+        print("KEY:   PC |        FL       | RAM: PC PC+1 PC+2 | REG[0]...REG[7]")
+        print(f"TRACE: %02X | %s |      %02X  %02X  %02X   |" % (
             self.pc,
             ' '.join([str(elem) for elem in self.fl]),
             #self.ie,
@@ -191,14 +197,16 @@ class CPU:
         self.pc = self.reg[self.operand_a]
 
     def jeq(self):
-        if self.fl[EQ] == 1: # equal flag is true
-            self.jmp()
+        if self.fl[EQ]: # equal flag is true
+            # self.jmp()
+            self.pc = self.reg[self.ram[self.pc + 1]]
         else:
             self.pc += 2
 
     def jne(self):
-        if self.fl[EQ] == 0:  # equal flag is false
-            self.jmp()
+        if not self.fl[EQ]:  # equal flag is false
+            # self.jmp()
+            self.pc = self.reg[self.ram[self.pc + 1]]
         else:
             self.pc += 2
 
@@ -209,7 +217,7 @@ class CPU:
         
         # self.trace()
         while self.running:
-            self.trace()
+            # self.trace()
             ir = self.pc
             inst = self.ram[ir]
             self.operand_a = self.ram_read(ir + 1)
