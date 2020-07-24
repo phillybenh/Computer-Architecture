@@ -15,6 +15,10 @@ CMP = 0b10100111
 JMP = 0b01010100
 JEQ = 0b01010101
 JNE = 0b01010110
+## Flag Locations
+EQ = 7
+LT = 5
+GT = 6
 
 class CPU:
     """Main CPU class."""
@@ -88,11 +92,11 @@ class CPU:
             self.reg[reg_a] *= self.reg[reg_b]
         elif op == "CMP":
             if reg_a == reg_b:
-                self.fl[7] = 1
+                self.fl[EQ] = 1
             elif reg_a < reg_b:
-                self.fl[7] = 1
+                self.fl[LT] = 1
             elif reg_a > reg_b:
-                self.fl[6] = 1
+                self.fl[GT] = 1
         else:
             raise Exception("Unsupported ALU operation")
 
@@ -184,11 +188,14 @@ class CPU:
 
     #### Sprint
     def jmp(self):
-        pass
+        self.pc = self.reg[self.operand_a]
 
     def jeq(self):
-        pass
-
+        if self.fl[EQ] == 1: # equal flag is true
+            self.jmp()
+        else:
+            self.pc += 2
+            
     def jne(self):
         pass
 
