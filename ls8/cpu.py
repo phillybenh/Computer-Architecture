@@ -101,10 +101,10 @@ class CPU:
         Handy function to print out the CPU state. You might want to call this
         from run() if you need help debugging.
         """
-
-        print(f"TRACE: %02X | %02X %02X %02X |" % (
+        print("KEY: PC | FL | RAM[PC] RAM[PC+1] RAM[PC+2] | REG[0]...REG[7]")
+        print(f"TRACE: %02X | %s | %02X %02X %02X |" % (
             self.pc,
-            #self.fl,
+            ' '.join([str(elem) for elem in self.fl]),
             #self.ie,
             self.ram_read(self.pc),
             self.ram_read(self.pc + 1),
@@ -199,7 +199,7 @@ class CPU:
         
         # self.trace()
         while self.running:
-            # self.trace()
+            self.trace()
             ir = self.pc
             inst = self.ram[ir]
             self.operand_a = self.ram_read(ir + 1)
