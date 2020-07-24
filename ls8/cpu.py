@@ -11,6 +11,10 @@ POP = 0b01000110
 CALL = 0b01010000
 RET = 0b00010001
 ADD = 0b10100000
+CMP = 0b10100111
+JMP = 0b01010100
+JEQ = 0b01010101
+JNE = 0b01010110
 
 class CPU:
     """Main CPU class."""
@@ -37,6 +41,11 @@ class CPU:
         self.branchtable[POP] = self.pop
         self.branchtable[CALL] = self.call
         self.branchtable[RET] = self.ret
+        self.branchtable[CMP] = self.cmp
+        self.branchtable[JMP] = self.jmp
+        self.branchtable[JEQ] = self.jeq
+        self.branchtable[JNE] = self.jne
+
 
     ## RAM Functions
     # Memory Address Register, holds the memory address we're 
@@ -110,14 +119,6 @@ class CPU:
     def prn(self):
         print(self.reg[self.operand_a])
         self.pc += 2
-
-    def mul(self):
-        self.alu("MUL", self.operand_a, self.operand_b)
-        self.pc += 3
-
-    def add(self):
-        self.alu("ADD", self.operand_a, self.operand_b)
-        self.pc += 3
     
     def push(self):
         # decrement the sp
@@ -157,6 +158,34 @@ class CPU:
 
         # Set the PC to the return address
         self.pc = return_addr
+    
+    ### ALU functions
+    def mul(self):
+        self.alu("MUL", self.operand_a, self.operand_b)
+        self.pc += 3
+
+    def add(self):
+        self.alu("ADD", self.operand_a, self.operand_b)
+        self.pc += 3
+
+    #### Sprint
+    def cmp(self):
+        self.alu("CMP", self.operand_a, self.operand_b)
+        self.pc += 3
+    ####
+    ###
+
+    #### Sprint
+    def jmp(self):
+        pass
+
+    def jeq(self):
+        pass
+
+    def jne(self):
+        pass
+
+    ####
 
     def run(self):
         """Run the CPU."""
