@@ -195,9 +195,12 @@ class CPU:
             self.jmp()
         else:
             self.pc += 2
-            
+
     def jne(self):
-        pass
+        if self.fl[EQ] == 0:  # equal flag is false
+            self.jmp()
+        else:
+            self.pc += 2
 
     ####
 
